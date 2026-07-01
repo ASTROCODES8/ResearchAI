@@ -47,8 +47,8 @@ async def upload_paper(
 
     # 1. Extract text + summary via Gemini (blocking call wrapped in to_thread)
     try:
-        text = await asyncio.to_thread(extract_text_from_pdf_bytes, pdf_bytes)
-        summary = await asyncio.to_thread(extract_paper_summary, text)
+        text = extract_text_from_pdf_bytes(pdf_bytes)
+        summary = await extract_paper_summary(text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gemini processing error: {e}")
 
