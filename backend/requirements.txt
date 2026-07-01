@@ -5,7 +5,8 @@ motor
 pymongo
 python-multipart
 pydantic[email]
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 cloudinary
 langchain
 langchain-google-genai
