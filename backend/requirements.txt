@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+motor
+pymongo
+python-multipart
+pydantic[email]
+passlib[bcrypt]
+cloudinary
+langchain
+langchain-google-genai
+langchain-community
+pypdf
+python-jose[cryptography]
+google-generativeai
+qdrant-client
+neo4j

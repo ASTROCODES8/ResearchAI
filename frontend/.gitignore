@@ -1,0 +1,11 @@
+.env
+*.local
+node_modules/
+dist/
+.vite/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.env.production
+coverage/
