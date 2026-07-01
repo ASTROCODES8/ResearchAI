@@ -75,9 +75,17 @@ async def upload_paper(
 
     # -- STAGE 2: Chunking & Embeddings --
     try:
-        chunks = chunk_paper(text, str(doc["_id"]), doc["title"], doc["authors"], doc["published_date"])
+        chunks = chunk_paper(text)
         # Offload Qdrant IO to a thread
-        await asyncio.to_thread(upsert_chunk_embeddings, chunks, user_id)
+        await asyncio.to_thread(
+            upsert_chunk_embeddings,
+            str(doc["_id"]),
+            user_id,
+            doc["title"],
+            doc["authors"],
+            doc["published_date"],
+            chunks
+        )
         print(f"✅ Vectors written → Qdrant")
     except Exception as e:
         print(f"⚠️ Vector insertion failed for paper {doc['_id']}: {e}")
@@ -85,9 +93,9 @@ async def upload_paper(
     # -- STAGE 4: Graph Extraction & Writing --
     try:
         # 1. Extract relationships using Gemini
-        graph_data = await asyncio.to_thread(extract_graph_data, text, str(doc["_id"]))
+        graph_data = await asyncio.to_thread(extract_graph_data, text)
         # 2. Write to Neo4j (Offload blocking IO to a thread)
-        await asyncio.to_thread(upsert_paper_graph, graph_data, user_id)
+        await asyncio.to_thread(upsert_paper_graph, str(doc["_id"]), user_id, graph_data)
         print(f"✅ Graph written → Neo4j")
     except Exception as e:
         print(f"⚠️ Neo4j write failed for paper {doc['_id']}: {e}")
