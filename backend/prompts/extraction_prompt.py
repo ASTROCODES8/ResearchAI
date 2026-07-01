@@ -1,6 +1,12 @@
 EXTRACTION_PROMPT = """You are an expert research paper analyst. Below is the extracted text from a research paper.
 
-Your task is to extract the following fields and return ONLY a valid JSON object — no markdown, no explanation, no extra text.
+Your task is to extract the following fields and return ONLY a valid JSON object.
+
+CRITICAL: Your response must be valid, parseable JSON only.
+- Do NOT include any text before or after the JSON
+- Do NOT use newlines inside string values — write the overview as a single continuous line
+- Do NOT include any special characters that would break JSON parsing
+- Ensure all strings are properly escaped
 
 Fields to extract:
 - "title": The full title of the paper. If not found, use "Unknown Title".

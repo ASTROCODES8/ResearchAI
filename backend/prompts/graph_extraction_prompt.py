@@ -40,7 +40,13 @@ RULES:
   2. Extract 8–20 relationships between those entities.
   3. Use UPPERCASE_WITH_UNDERSCORES for relation names (e.g. USES, TRAINED_ON, OUTPERFORMS, PROPOSES, EVALUATED_ON, PART_OF, EXTENDS, COMPARED_TO, ACHIEVES).
   4. Every entity in a relationship MUST also appear in the entities list.
-  5. Return ONLY a valid JSON object — no markdown, no explanation, no extra text.
+  5. Return ONLY a valid JSON object.
+
+CRITICAL: Your response must be valid, parseable JSON only.
+- Do NOT include any text before or after the JSON
+- Do NOT use newlines inside string values
+- Do NOT include any special characters that would break JSON parsing
+- Ensure all strings are properly escaped
 
 Paper text:
 {text}

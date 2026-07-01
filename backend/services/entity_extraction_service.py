@@ -43,15 +43,23 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     google_api_key=GEMINI_API_KEY,
     temperature=0.1,
+    max_output_tokens=8192,
 )
 
 
 def _clean_json_response(raw: str) -> str:
-    """Strip markdown code fences if present — same helper as paper_service."""
+    """Strip markdown code fences if present and extract the JSON object."""
     raw = raw.strip()
     raw = re.sub(r"^```(?:json)?\s*", "", raw)
     raw = re.sub(r"\s*```$", "", raw)
-    return raw.strip()
+    raw = raw.strip()
+    
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start != -1 and end != -1:
+        raw = raw[start:end+1]
+        
+    return raw
 
 
 def _validate_extraction(data: dict) -> dict:
