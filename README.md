@@ -117,7 +117,7 @@ Pure vector search struggles with multi-hop reasoning (connecting facts across d
 | :--- | :--- |
 | **Frontend** | React (Vite), TypeScript |
 | **Backend** | Python, FastAPI, Uvicorn |
-| **Database** | MongoDB (Motor / PyMongo) |
+| **Database** | MongoDB |
 | **Vector Database** | Qdrant Cloud |
 | **Graph Database** | Neo4j AuraDB |
 | **Authentication** | JWT, Passlib (bcrypt), python-jose |
