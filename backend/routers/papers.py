@@ -93,7 +93,7 @@ async def upload_paper(
     # -- STAGE 4: Graph Extraction & Writing --
     try:
         # 1. Extract relationships using Gemini
-        graph_data = await asyncio.to_thread(extract_graph_data, text)
+        graph_data = await extract_graph_data(text)
         # 2. Write to Neo4j (Offload blocking IO to a thread)
         await asyncio.to_thread(upsert_paper_graph, str(doc["_id"]), user_id, graph_data)
         print(f"✅ Graph written → Neo4j")
