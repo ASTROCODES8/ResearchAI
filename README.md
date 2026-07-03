@@ -2,7 +2,7 @@
 
 An intelligent, AI-powered research paper analysis platform that combines semantic vector search with a Neo4j knowledge graph to extract, visualize, and query knowledge from academic documents.
 
-> **Live Demo:** https://researchai-frontend-cyan.vercel.app/ (#) &nbsp;|&nbsp; **Authors:** [ASTROCODES8](https://github.com/ASTROCODES8),[Likhith-Banka](https://github.com/Likhith-Banka)
+> **Live Demo:** https://researchai-frontend-cyan.vercel.app/ (#) &nbsp;|&nbsp; **Authors:** [ASTROCODES8](https://github.com/ASTROCODES8), [Likhith-Banka](https://github.com/Likhith-Banka)
 
 ---
 
