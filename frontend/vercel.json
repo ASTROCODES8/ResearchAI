@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://researchai-tfyy.onrender.com/$1"
+    }
+  ]
+}
