@@ -2,6 +2,7 @@ import os
 import json
 import re
 import asyncio
+import time
 
 import google.generativeai as genai
 from dotenv import load_dotenv
@@ -169,6 +170,9 @@ async def answer_question(question: str, user_id: str, top_k: int = 8) -> dict:
     3. Combine contexts -> Gemini Generation
     """
     
+    print(f"\n--- Processing Query: {question} ---")
+    t0 = time.time()
+    
     # Run embedding and entity extraction in parallel
     question_vector_task = asyncio.to_thread(_embed_question, question)
     entities_task = _extract_query_entities(question)
@@ -177,8 +181,12 @@ async def answer_question(question: str, user_id: str, top_k: int = 8) -> dict:
         question_vector_task, 
         entities_task
     )
+    
+    t1 = time.time()
+    print(f"⏱️ Embedding + Entity Extraction took: {t1 - t0:.3f} seconds")
 
     # Fetch context from DBs in parallel
+    t2 = time.time()
     graph_context_task = asyncio.to_thread(_get_graph_context, user_id, query_entities)
     chunk_context_task = asyncio.to_thread(_get_chunk_context, user_id, question_vector, top_k)
 
@@ -186,6 +194,8 @@ async def answer_question(question: str, user_id: str, top_k: int = 8) -> dict:
         graph_context_task,
         chunk_context_task
     )
+    t3 = time.time()
+    print(f"⏱️ Qdrant Vector + Neo4j Graph Retrieval took: {t3 - t2:.3f} seconds")
 
     print(f"\n🔍 Query: '{question}'")
     print(f"   Entities extracted: {query_entities}")
@@ -206,7 +216,12 @@ async def answer_question(question: str, user_id: str, top_k: int = 8) -> dict:
         question=question,
     )
 
+    t4 = time.time()
     response = await llm.ainvoke([HumanMessage(content=prompt)])
+    t5 = time.time()
+    
+    print(f"⏱️ Gemini Answer Generation took: {t5 - t4:.3f} seconds")
+    print(f"⏱️ TOTAL PIPELINE LATENCY: {t5 - t0:.3f} seconds\n")
 
     return {
         "answer": response.content,
