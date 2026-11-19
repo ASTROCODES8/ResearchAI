@@ -38,26 +38,51 @@ def init_neo4j():
     global _driver
 
     if not NEO4J_URI or not NEO4J_USERNAME or not NEO4J_PASSWORD:
-        raise ValueError("NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD must be set in .env")
+        print("⚠️  NEO4J credentials not fully set in .env. Graph features will be disabled.")
+        return
 
-    _driver = GraphDatabase.driver(
-        NEO4J_URI,
-        auth=(NEO4J_USERNAME, NEO4J_PASSWORD),
-    )
-
-    # Verify the connection is alive
-    _driver.verify_connectivity()
+    uri = NEO4J_URI
+    try:
+        _driver = GraphDatabase.driver(
+            uri,
+            auth=(NEO4J_USERNAME, NEO4J_PASSWORD),
+        )
+        _driver.verify_connectivity()
+    except Exception as e:
+        # If strict SSL verification failed (e.g. on Linux/Render with self-signed certificate chain),
+        # retry with self-signed certificate tolerance (+ssc)
+        err_msg = str(e)
+        if ("CERTIFICATE_VERIFY_FAILED" in err_msg or "BoltSecurityError" in err_msg or "certificate verify failed" in err_msg) and "+s://" in uri:
+            fallback_uri = uri.replace("+s://", "+ssc://")
+            print(f"⚠️  Strict SSL verification failed for Neo4j. Retrying with fallback URI: {fallback_uri}")
+            try:
+                if _driver:
+                    _driver.close()
+                _driver = GraphDatabase.driver(
+                    fallback_uri,
+                    auth=(NEO4J_USERNAME, NEO4J_PASSWORD),
+                )
+                _driver.verify_connectivity()
+                uri = fallback_uri
+            except Exception as inner_e:
+                print(f"❌  Neo4j connection failed even with fallback URI: {inner_e}")
+                _driver = None
+                return
+        else:
+            print(f"❌  Neo4j connection failed on startup: {e}")
+            _driver = None
+            return
 
     # Create schema constraints for entity dedup
-    with _driver.session() as session:
-        # Uniqueness constraint: (Entity.name) — prevents duplicate entity nodes
-        # "IF NOT EXISTS" keeps init idempotent
-        session.run(
-            "CREATE CONSTRAINT entity_name_unique IF NOT EXISTS "
-            "FOR (e:Entity) REQUIRE e.name IS UNIQUE"
-        )
-
-    print("✅  Neo4j connected — constraints ensured")
+    try:
+        with _driver.session() as session:
+            session.run(
+                "CREATE CONSTRAINT entity_name_unique IF NOT EXISTS "
+                "FOR (e:Entity) REQUIRE e.name IS UNIQUE"
+            )
+        print("✅  Neo4j connected — constraints ensured")
+    except Exception as e:
+        print(f"⚠️  Connected to Neo4j, but failed to ensure constraints: {e}")
 
 
 def close_neo4j():

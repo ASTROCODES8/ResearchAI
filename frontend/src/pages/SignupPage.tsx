@@ -113,7 +113,12 @@ export default function SignupPage() {
       await signup(email, password, name);
       toast.success("Account created!");
     } catch (err: any) {
-      const msg = err?.response?.data?.detail || "Signup failed. Try again.";
+      let msg = "Signup failed. Try again.";
+      if (err?.response?.data?.detail) {
+        msg = err.response.data.detail;
+      } else if (err?.response?.status >= 500 || !err?.response) {
+        msg = "Server is waking up or unreachable. Please wait a moment and try again.";
+      }
       toast.error(msg);
     } finally {
       setLoading(false);

@@ -57,7 +57,14 @@ export default function LoginPage() {
       await login(email, password);
       toast.success("Welcome back!");
     } catch (err: any) {
-      const msg = err?.response?.data?.detail || "Invalid email or password";
+      let msg = "Invalid email or password";
+      if (err?.response?.data?.detail) {
+        msg = err.response.data.detail;
+      } else if (err?.response?.status >= 500) {
+        msg = "Server is waking up or temporarily unavailable. Please retry in 30 seconds.";
+      } else if (!err?.response) {
+        msg = "Cannot connect to server. It may still be waking up, please wait a moment.";
+      }
       toast.error(msg);
     } finally {
       setLoading(false);
